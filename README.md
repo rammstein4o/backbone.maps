@@ -2,7 +2,7 @@
 
 Based on [Edan Schwartz's work](https://github.com/eschwartz/backbone.googlemaps)
 
-A Backbone JS extension for interacting with the Google Maps API (v3.10)
+A Backbone JS extension for interacting with javascript maps APIs
 
 ## About backbone.googlemaps
 

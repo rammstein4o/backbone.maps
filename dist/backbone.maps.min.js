@@ -1,6 +1,6 @@
 /*!
  * backbone.maps
- * A Backbone JS extension for interacting with the Google Maps API (v3.10)
+ * A Backbone JS extension for interacting with javascript maps APIs
  * Copyright (c) 2015 Radoslav Salov
  * Distributed under MIT license
  * Copyright for portions of the project are held by:
