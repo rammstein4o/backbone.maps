@@ -1,0 +1,27 @@
+{
+	// Enforcing options
+	"curly": false,   // Require {} for every new block or scope.
+	"es3": true,
+	"sub": true,
+	"validthis": true,
+	"undef": true,    // Prohibits the use of explicitly undeclared variables.
+	"unused": false,  // Warns when you define and never use your variables.
+	"freeze": true,   // Prohibits overwriting prototypes of native objects.
+
+	// Environments
+	"jquery": true,   // jQuery
+	"browser": true,  // Web Browser (window, document, etc)
+	"devel": true,    // Development/debugging (alert, confirm, etc)
+	
+	// Predefined global variables
+	"globals": {
+		"$": false,
+		"google": false,
+		"_": false,
+		"Backbone": false,
+		"module": false,
+		"require": false,
+		"define": false
+	}
+	
+}
