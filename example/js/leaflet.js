@@ -27,23 +27,23 @@ var places = new Backbone.Maps.LocationCollection([
 ]);
 
 $(document).ready(function() {
-	var mapOptions = {
-		center: new google.maps.LatLng(44.9796635, -93.2748776),
-		zoom: 9,
-		mapTypeId: google.maps.MapTypeId.ROADMAP
-	};
 	
 	// Instantiate map
-	var map = new google.maps.Map($('#map_canvas')[0], mapOptions);
+	var map = L.map('map_canvas').setView([44.9796635, -93.2748776], 9);
+	
+	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+		id: 'mapbox.streets'
+	}).addTo(map);
 	
 	// Render Markers
-	var markerCollectionView = new Backbone.Maps.OverlayViewD3({
+	var markerCollectionView = new Backbone.Maps.MarkerCollectionView({
+		collection: places,
 		map: map
 	});
-	
-	places.each(function(place) {
-		markerCollectionView.addMarker(place);
-	});
-	
 	markerCollectionView.render();
+	
 });

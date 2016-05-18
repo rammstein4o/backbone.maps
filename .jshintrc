@@ -17,6 +17,7 @@
 	"globals": {
 		"$": false,
 		"google": false,
+		"L": false,
 		"_": false,
 		"Backbone": false,
 		"module": false,

@@ -1,4 +1,4 @@
-var places = new Backbone.GoogleMaps.LocationCollection([
+var places = new Backbone.Maps.LocationCollection([
 	{
 		title: "Walker Art Center",
 		lat: 44.9796635,
@@ -37,7 +37,7 @@ $(document).ready(function() {
 	var map = new google.maps.Map($('#map_canvas')[0], mapOptions);
 	
 	// Render Markers
-	var markerCollectionView = new Backbone.GoogleMaps.MarkerCollectionView({
+	var markerCollectionView = new Backbone.Maps.MarkerCollectionView({
 		collection: places,
 		map: map
 	});

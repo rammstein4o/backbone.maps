@@ -37,7 +37,7 @@ var bars = [
 
 var App = {};
 
-App.Location = Backbone.GoogleMaps.Location.extend({
+App.Location = Backbone.Maps.Location.extend({
 	idAttribute: 'title',
 	defaults: {
 		lat: 45,
@@ -45,11 +45,11 @@ App.Location = Backbone.GoogleMaps.Location.extend({
 	}
 });
 
-App.LocationCollection = Backbone.GoogleMaps.LocationCollection.extend({
+App.LocationCollection = Backbone.Maps.LocationCollection.extend({
 	model: App.Location
 });
 
-App.InfoWindow = Backbone.GoogleMaps.InfoWindow.extend({
+App.InfoWindow = Backbone.Maps.InfoWindow.extend({
 	template: '#infoWindow-template',
 	
 	events: {
@@ -61,7 +61,7 @@ App.InfoWindow = Backbone.GoogleMaps.InfoWindow.extend({
 	}
 });
 
-App.MarkerView = Backbone.GoogleMaps.MarkerView.extend({
+App.MarkerView = Backbone.Maps.MarkerView.extend({
 	infoWindow: App.InfoWindow,
 	
 	initialize: function() {
@@ -103,11 +103,11 @@ App.BarMarker = App.MarkerView.extend({
 	}
 });
 
-App.MarkerCollectionView = Backbone.GoogleMaps.MarkerCollectionView.extend({
+App.MarkerCollectionView = Backbone.Maps.MarkerCollectionView.extend({
 	markerView: App.MarkerView,
 	addChild: function(model) {
 		this.markerView = model.get('type') === 'museum' ? App.MuseumMarker : App.BarMarker;
-		Backbone.GoogleMaps.MarkerCollectionView.prototype.addChild.apply(this, arguments);
+		Backbone.Maps.MarkerCollectionView.prototype.addChild.apply(this, arguments);
 	}
 });
 

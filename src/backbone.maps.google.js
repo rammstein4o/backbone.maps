@@ -9,28 +9,29 @@
 (function(root, factory) {
 	if (typeof define === 'function' && define.amd) {
 		// AMD. Register as an anonymous module.
-		define(['backbone', 'underscore', 'jquery'], factory);
+		define(['backbone', 'underscore', 'jquery', 'd3'], factory);
 	} else if (typeof exports === 'object') {
 		// as CommonJS module
 		var _ = require('underscore'), $;
 		try { $ = require('jquery'); } catch(e) {}
 		var Backbone = require('backbone');
+		var d3 = require('d3');
 		module.exports = factory(Backbone, _, $);
 	} else {
 		// Browser globals
-		factory(root.Backbone, root._, root.jQuery || root.Zepto || root.ender);
+		factory(root.Backbone, root._, root.jQuery || root.Zepto || root.ender, root.d3);
 	}
-}(this, function(Backbone, _, $) {
+}(this, function(Backbone, _, $, d3) {
 	'use strict';
 	
-	var GoogleMaps = {};
+	var Maps = {};
 	
 	/**
-	* GoogleMaps.Location
+	* Maps.Location
 	* --------------------
 	* Representing a lat/lng location on a map
 	*/
-	GoogleMaps.Location = Backbone.Model.extend({
+	Maps.Location = Backbone.Model.extend({
 		constructor: function() {
 			_.bindAll(this, 'select', 'deselect', 'toggleSelect', 'getLatLng', 'getLatlng');
 			
@@ -72,17 +73,17 @@
 	});
 
 	/**
-	* GoogleMaps.LocationCollection
+	* Maps.LocationCollection
 	* ------------------------------
 	* A collection of map locations
 	*/
-	GoogleMaps.LocationCollection = Backbone.Collection.extend({
+	Maps.LocationCollection = Backbone.Collection.extend({
 		constructor: function(opt_models, opt_options) {
 			var options = _.defaults({}, opt_options, {
-				model: GoogleMaps.Location
+				model: Maps.Location
 			});
 			// Set default model
-			options.model = (options.model || GoogleMaps.Location);
+			options.model = (options.model || Maps.Location);
 			Backbone.Collection.prototype.constructor.call(this, opt_models, options);
 			// Deselect other models on model select
 			// ie. Only a single model can be selected in a collection
@@ -100,11 +101,11 @@
 
 
 	/**
-	* GoogleMaps.MapView
+	* Maps.OverlayView
 	* ------------------
 	* Base maps overlay view from which all other overlay views extend
 	*/
-	GoogleMaps.MapView = Backbone.View.extend({
+	Maps.OverlayView = Backbone.View.extend({
 		constructor: function(options) {
 			_.bindAll(this, 'render', 'close');
 			
@@ -135,7 +136,7 @@
 			
 			_.each(mapEvents, function(handlerRef, topic) {
 				var handler = this._getHandlerFromReference(handlerRef);
-				this._addGoogleMapsListener(topic, handler, context);
+				this._addMapsListener(topic, handler, context);
 			}, this);
 		},
 
@@ -151,7 +152,7 @@
 			return handler;
 		},
 
-		_addGoogleMapsListener: function(topic, handler, opt_context) {
+		_addMapsListener: function(topic, handler, opt_context) {
 			if (opt_context) handler = _.bind(handler, opt_context);
 			google.maps.event.addListener(this.gOverlay, topic, handler);
 		},
@@ -194,13 +195,13 @@
 	});
 
 	/**
-	* GoogleMaps.InfoWindow
+	* Maps.InfoWindow
 	* ---------------------
 	* View controller for a google.maps.InfoWindow overlay instance
 	*/
-	GoogleMaps.InfoWindow = GoogleMaps.MapView.extend({
+	Maps.InfoWindow = Maps.OverlayView.extend({
 		constructor: function(options) {
-			GoogleMaps.MapView.prototype.constructor.apply(this, arguments);
+			Maps.OverlayView.prototype.constructor.apply(this, arguments);
 
 			_.bindAll(this, 'render', 'close');
 
@@ -214,8 +215,8 @@
 		},
 		
 		onRender: function() {
-			if (GoogleMaps.MapView.prototype.onRender) {
-				GoogleMaps.MapView.prototype.onRender.apply(this, arguments);
+			if (Maps.OverlayView.prototype.onRender) {
+				Maps.OverlayView.prototype.onRender.apply(this, arguments);
 			}
 			// Render element
 			var tmplFn;
@@ -232,33 +233,35 @@
 				}
 				tmplFn = _.template(tmpl);
 			}
-			this.$el.html(tmplFn(this.model.toJSON()));
+			if (typeof tmplFn === 'function') {
+				this.$el.html(tmplFn(this.model.toJSON()));
 
-			// Create InfoWindow
-			this.gOverlay = new google.maps.InfoWindow(_.extend({
-				content: this.$el[0]
-			}, this.overlayOptions));
+				// Create InfoWindow
+				this.gOverlay = new google.maps.InfoWindow(_.extend({
+					content: this.$el[0]
+				}, this.overlayOptions));
 
-			// Display InfoWindow on map
-			this.gOverlay.open(this.map, this.marker);
+				// Display InfoWindow on map
+				this.gOverlay.open(this.map, this.marker);
+			}
 		}
 		
 	});
 
 
 	/**
-	* GoogleMaps.MarkerView
+	* Maps.MarkerView
 	* ---------------------
 	* View controller for a marker overlay
 	*/
-	GoogleMaps.MarkerView = GoogleMaps.MapView.extend({
+	Maps.MarkerView = Maps.OverlayView.extend({
 		constructor: function(options) {
 			// Set associated InfoWindow view
-			GoogleMaps.MapView.prototype.constructor.apply(this, arguments);
+			Maps.OverlayView.prototype.constructor.apply(this, arguments);
 			
 			_.bindAll(this, 'render', 'close', 'openDetail', 'closeDetail', 'toggleSelect');
 			
-			this.infoWindow = this.infoWindow || this.options.infoWindow;
+			this.infoWindow = this.infoWindow || this.options.infoWindow || Maps.InfoWindow;
 			
 			// Ensure model
 			if (!this.model) throw new Error("A model must be specified for a MarkerView");
@@ -324,22 +327,22 @@
 		},
 		
 		onRender: function() {
-			if (GoogleMaps.MapView.prototype.onRender) {
-				GoogleMaps.MapView.prototype.onRender.apply(this, arguments);
+			if (Maps.OverlayView.prototype.onRender) {
+				Maps.OverlayView.prototype.onRender.apply(this, arguments);
 			}
 			this.gOverlay.setVisible(true);
 		},
 		
 		beforeClose: function() {
-			if (GoogleMaps.MapView.prototype.beforeClose) {
-				GoogleMaps.MapView.prototype.beforeClose.apply(this, arguments);
+			if (Maps.OverlayView.prototype.beforeClose) {
+				Maps.OverlayView.prototype.beforeClose.apply(this, arguments);
 			}
 			this.closeDetail();
 		},
 		
 		onClose: function() {
-			if (GoogleMaps.MapView.prototype.onClose) {
-				GoogleMaps.MapView.prototype.onClose.apply(this, arguments);
+			if (Maps.OverlayView.prototype.onClose) {
+				Maps.OverlayView.prototype.onClose.apply(this, arguments);
 			}
 			this.model.off();
 		},
@@ -363,13 +366,13 @@
 
 
 	/**
-	* GoogleMaps.MarkerCollectionView
+	* Maps.MarkerCollectionView
 	* -------------------------------
 	* Collection of MarkerViews
 	*/
-	GoogleMaps.MarkerCollectionView = Backbone.View.extend({
+	Maps.MarkerCollectionView = Backbone.View.extend({
 		constructor: function(options) {
-			this.markerView = this.markerView || GoogleMaps.MarkerView;
+			this.markerView = this.markerView || Maps.MarkerView;
 			this.markerViewChildren = this.markerViewChildren || {};
 
 			Backbone.View.prototype.constructor.apply(this, arguments);
@@ -417,7 +420,7 @@
 
 		closeChild: function(child) {
 			// Param can be child's model, or child view itself
-			var childView = (child instanceof GoogleMaps.Location) ? this.markerViewChildren[child.cid] : child;
+			var childView = (child instanceof Maps.Location) ? this.markerViewChildren[child.cid] : child;
 			childView.close();
 			delete this.markerViewChildren[childView.model.cid];
 		},
@@ -451,7 +454,58 @@
 			this.collection.off();
 		}
 	});
+	
+	Maps.OverlayViewD3 = Maps.OverlayView.extend({
+		constructor: function(options) {
+			Maps.OverlayView.prototype.constructor.apply(this, arguments);
+			var _this = this;
+			this.gBounds = new google.maps.LatLngBounds();
+			this.gOverlay = new google.maps.OverlayView();
+			this.gLayer = null;
+			this.gOverlay.onAdd = function() {
+				_this.gLayer = d3.select(this.getPanes().overlayMouseTarget).append("div").attr("class", "stations");
+			};
+			this.markers = {};
+		},
+		
+		addMarker: function(model) {
+			model = (model instanceof Maps.Location) ? model : new Maps.Location(model);
+			this.markers[model.cid] = model;
+		},
+		
+		onRender: function() {
+			if (Maps.OverlayView.prototype.onRender) {
+				Maps.OverlayView.prototype.onRender.apply(this, arguments);
+			}
+			var _this = this;
+			this.gOverlay.draw = function() {
+				var projection = this.getProjection(), padding = 10;
+				var marker = _this.gLayer.selectAll("svg").data(d3.entries(_this.markers)).each(transform)
+					.enter().append("svg:svg")
+					.each(transform)
+					.attr("class", "marker");
+					
+				marker.append("svg:circle")
+					.attr("r", 5)
+					.attr("cx", padding)
+					.attr("cy", padding)
+					.on("click", toggleNode);
+				
+				function transform(d) {
+					d = projection.fromLatLngToDivPixel(d.value.getLatLng());
+					return d3.select(this).style("left", (d.x - padding) + "px").style("top", (d.y - padding) + "px");
+				}
+				
+				function toggleNode() {
+					var radius = (d3.select(this).attr("r") == 10 ? 5 : 10);
+					d3.select(this).transition().duration(100).attr("r", radius);
+				}
+				
+			};
+			this.gOverlay.setMap(this.map);
+		}
+	});
 
-	Backbone.GoogleMaps = GoogleMaps;
-	return GoogleMaps;
+	Backbone.Maps = Maps;
+	return Maps;
 }));

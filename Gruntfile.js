@@ -17,8 +17,8 @@ module.exports = function (grunt) {
 		banner: '/*!\n * backbone.maps\n * A Backbone JS extension for interacting with javascript maps APIs\n * Copyright (c) 2015' + (fullYear != 2015 ? '-' + fullYear : '') + ' Radoslav Salov\n * Distributed under MIT license\n * Copyright for portions of the project are held by:\n * Edan Schwartz (c) 2012-2015 ( https://github.com/eschwartz/backbone.googlemaps )\n */\n',
 		jshintFiles: ['Gruntfile.js', '<%= config.src %>/*.js', '<%= config.example %>/js/**/*.js'],
 		uglifyFiles: {
-			'<%= config.dist %>/backbone.maps.min.js': [ '<%= config.src %>/backbone.maps.js' ],
-			'<%= config.dist %>/backbone.maps-d3.min.js': [ '<%= config.src %>/backbone.maps-d3.js' ]
+			'<%= config.dist %>/backbone.maps.google.min.js': [ '<%= config.src %>/backbone.maps.google.js' ],
+			'<%= config.dist %>/backbone.maps.leaflet.min.js': [ '<%= config.src %>/backbone.maps.leaflet.js' ]
 		}
 	};
 	
