@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Simple Leaflet Example | Backbone.Maps</title>
+		<style type="text/css">
+			html {
+				height: 100%
+			}
+			body {
+				height: 100%;
+				margin: 0;
+				padding: 0
+			}
+			#map_canvas {
+				height: 100%
+			}
+		</style>
+		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+	</head>
+	<body>
+		<!-- TEMPLATE: InfoWindow ============================== -->
+		<script id="infoWindow-template" type="text/html">
+			<h2><%=title %></h2>
+			<p>Latitude: <%=lat %></p>
+			<p>Longitude: <%=lng %></p>
+		</script>
+		<div id="map_canvas" style="width:100%; height:100%"></div>
+		<script type="text/javascript" src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.3/backbone-min.js"></script>
+		<script type="text/javascript" src="../../dist/backbone.maps.leaflet.min.js"></script>
+		<script type="text/javascript">
+			var places = new Backbone.Maps.LocationCollection([
+				{
+					title: "Walker Art Center",
+					lat: 44.9796635,
+					lng: -93.2748776
+				}, {
+					title: "Science Museum of Minnesota",
+					lat: 44.9429618,
+					lng: -93.0981016
+				}, {
+					title: "The Museum of Russian Art",
+					lat: 44.9036337,
+					lng: -93.2755413
+				}, {
+					title: "Park Tavern",
+					lat: 44.9413272,
+					lng: -93.3705791
+				}, {
+					title: "Chatterbox Pub",
+					lat: 44.9393882,
+					lng: -93.2391039
+				}, {
+					title: "Acadia Cafe",
+					lat: 44.9709853,
+					lng: -93.2470717
+				}
+			]);
+
+			$(document).ready(function() {
+				
+				// Instantiate map
+				var map = L.map('map_canvas').setView([44.9796635, -93.2748776], 9);
+				
+				L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
+					maxZoom: 18,
+					attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+						'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+						'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+					id: 'mapbox.streets'
+				}).addTo(map);
+				
+				// Render Markers
+				var markerCollectionView = new Backbone.Maps.MarkerCollectionView({
+					collection: places,
+					map: map
+				});
+				markerCollectionView.render();
+				
+			});
+
+		</script>
+	</body>
+</html>

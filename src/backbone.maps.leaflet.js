@@ -179,10 +179,7 @@
 			if (this.gOverlay.close) {
 				this.gOverlay.close();
 			}
-			//~ google.maps.event.clearInstanceListeners(this.gOverlay);
-			if (this.gOverlay.setMap) {
-				this.gOverlay.setMap(null);
-			}
+			this.map.removeLayer(this.gOverlay);
 			this.gOverlay = null;
 
 			this.trigger('close');
@@ -237,9 +234,10 @@
 				// Create InfoWindow
 				this.gOverlay = Leaflet.popup()
 					.setContent(this.$el.html())
+					.setLatLng(this.marker.getLatLng())
 					.addTo(this.map);
 					
-				this.marker.bindPopup(this.gOverlay);
+				this.marker.bindPopup(this.gOverlay).openPopup();
 			}
 		}
 		
@@ -265,15 +263,13 @@
 
 			// Instantiate marker, with user defined properties
 			this.gOverlay = Leaflet.marker(this.model.getLatLng(), _.extend({
-					title: this.model.title,
-					opacity: 0
-				}, this.overlayOptions)).addTo(this.map);
+						title: this.model.title,
+						opacity: 0
+					}, this.overlayOptions)
+				)
+				.addTo(this.map)
+				.on('click', this.toggleSelect);
 			
-			// Add default mapEvents
-			_.extend(this.mapEvents, {
-				'click': 'toggleSelect'// Select model on marker click
-			});
-
 			// Show detail view on model select
 			this.model.on("change:selected", function(model, isSelected) {
 				if (isSelected) {
@@ -340,6 +336,7 @@
 		},
 
 		openDetail: function() {
+			this.closeDetail();
 			this.detailView = new this.infoWindow({
 				model: this.model,
 				map: this.map,

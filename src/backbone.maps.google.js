@@ -348,6 +348,7 @@
 		},
 
 		openDetail: function() {
+			this.closeDetail();
 			this.detailView = new this.infoWindow({
 				model: this.model,
 				map: this.map,

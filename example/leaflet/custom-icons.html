@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Custom Icons Leaflet Example | Backbone.Maps</title>
+		<style type="text/css">
+			html {
+				height: 100%
+			}
+			body {
+				height: 100%;
+				margin: 0;
+				padding: 0
+			}
+			#map_canvas {
+				height: 100%
+			}
+		</style>
+		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+	</head>
+	<body>
+		<!-- TEMPLATE: InfoWindow ============================== -->
+		<script id="infoWindow-template" type="text/html">
+			<h2><%=title %></h2>
+			<p>Latitude: <%=lat %></p>
+			<p>Longitude: <%=lng %></p>
+		</script>
+		<div id="map_canvas" style="width:100%; height:100%"></div>
+		<script type="text/javascript" src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.3/backbone-min.js"></script>
+		<script type="text/javascript" src="../../dist/backbone.maps.leaflet.min.js"></script>
+		<script type="text/javascript">
+			var places = new Backbone.Maps.LocationCollection([
+				{
+					title: "Walker Art Center",
+					lat: 44.9796635,
+					lng: -93.2748776,
+					options: {
+						icon: {
+							path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+							strokeColor: "black",
+							strokeWeight: 2,
+							scale: 6
+						}
+					}
+				}, {
+					title: "Science Museum of Minnesota",
+					lat: 44.9429618,
+					lng: -93.0981016,
+					options: {
+						icon: {
+							path: 'm0,0c0.69092,0 12.0909,-32.7778 12.0909,-32.7778c0,0 -8.63636,-17.2222 -8.63636,-17.2222c0,0 -10.36363,14.4444 -10.36363,14.4444l6.90909,35.5556z',
+							fillColor: '#777777',
+							fillOpacity: 0.8,
+							strokeColor: "black",
+							strokeWeight: 2,
+							scale: 1
+						}
+					}
+				}, {
+					title: "Chatterbox Pub",
+					lat: 44.9393882,
+					lng: -93.2391039,
+					options: {
+						icon: {
+							path: google.maps.SymbolPath.CIRCLE,
+							fillColor: '#00ff00',
+							fillOpacity: 1,
+							strokeColor: "green",
+							strokeWeight: 2,
+							scale: 12
+						}
+					}
+				}, {
+					title: "Acadia Cafe",
+					lat: 44.9709853,
+					lng: -93.2470717,
+					options: {
+						icon: {
+							path: 'm0,0c-0.34091,0.29409 16.70419,-19.99785 16.70419,-19.99785c0,0 -50.31381,-5.70713 -30.34027,0.58817c19.97355,6.2953 13.63608,19.40967 13.63608,19.40967l0,0.00001z',
+							fillColor: '#7f0000',
+							fillOpacity: 1,
+							scale: 1,
+							strokeColor: 'gold',
+							strokeWeight: 2
+
+						}
+					}
+				}
+			]);
+
+			$(document).ready(function() {
+				var mapOptions = {
+					center: new google.maps.LatLng(44.9796635, -93.2748776),
+					zoom: 11,
+					mapTypeId: google.maps.MapTypeId.ROADMAP
+				};
+				
+				// Instantiate map
+				var map = new google.maps.Map($('#map_canvas')[0], mapOptions);
+				
+				// Render Markers
+				var markerCollectionView = new Backbone.Maps.MarkerCollectionView({
+					collection: places,
+					map: map
+				});
+				markerCollectionView.render();
+			});
+		</script>
+	</body>
+</html>
