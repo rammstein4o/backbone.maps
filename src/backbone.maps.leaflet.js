@@ -447,13 +447,7 @@
 	Maps.OverlayViewD3 = Maps.OverlayView.extend({
 		constructor: function(options) {
 			Maps.OverlayView.prototype.constructor.apply(this, arguments);
-			var _this = this;
-			//~ this.gBounds = new google.maps.LatLngBounds();
-			//~ this.gOverlay = new google.maps.OverlayView();
-			this.gLayer = null;
-			this.gOverlay.onAdd = function() {
-				_this.gLayer = d3.select(this.getPanes().overlayMouseTarget).append("div").attr("class", "stations");
-			};
+			this.gLayer = d3.select(this.map.getPanes().overlayPane).append("div").attr("class", "stations");
 			this.markers = {};
 		},
 		
@@ -467,31 +461,28 @@
 				Maps.OverlayView.prototype.onRender.apply(this, arguments);
 			}
 			var _this = this;
-			this.gOverlay.draw = function() {
-				var projection = this.getProjection(), padding = 10;
-				var marker = _this.gLayer.selectAll("svg").data(d3.entries(_this.markers)).each(transform)
-					.enter().append("svg:svg")
-					.each(transform)
-					.attr("class", "marker");
-					
-				marker.append("svg:circle")
-					.attr("r", 5)
-					.attr("cx", padding)
-					.attr("cy", padding)
-					.on("click", toggleNode);
+			
+			var padding = 10;
+			var marker = _this.gLayer.selectAll("svg").data(d3.entries(_this.markers)).each(transform)
+				.enter().append("svg:svg")
+				.each(transform)
+				.attr("class", "marker");
 				
-				function transform(d) {
-					d = projection.fromLatLngToDivPixel(d.value.getLatLng());
-					return d3.select(this).style("left", (d.x - padding) + "px").style("top", (d.y - padding) + "px");
-				}
-				
-				function toggleNode() {
-					var radius = (d3.select(this).attr("r") == 10 ? 5 : 10);
-					d3.select(this).transition().duration(100).attr("r", radius);
-				}
-				
-			};
-			this.gOverlay.setMap(this.map);
+			marker.append("svg:circle")
+				.attr("r", 5)
+				.attr("cx", padding)
+				.attr("cy", padding)
+				.on("click", toggleNode);
+			
+			function transform(d) {
+				d = _this.map.latLngToLayerPoint(d.value.getLatLng());
+				return d3.select(this).style("left", (d.x - padding) + "px").style("top", (d.y - padding) + "px");
+			}
+			
+			function toggleNode() {
+				var radius = (d3.select(this).attr("r") == 10 ? 5 : 10);
+				d3.select(this).transition().duration(100).attr("r", radius);
+			}
 		}
 	});
 
